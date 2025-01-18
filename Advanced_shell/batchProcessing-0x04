@@ -1,0 +1,24 @@
+#!/bin/bash
+
+POKEMON_LIST=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+BASE_URL="https://pokeapi.co/api/v2/pokemon"
+ERROR_FILE="errors.txt"
+
+fetch_data() {
+  local POKEMON=$1
+  local OUTPUT_FILE="${POKEMON}.json"
+
+  curl -s -o "$OUTPUT_FILE" -w "%{http_code}" "$BASE_URL/$POKEMON" | grep -q "200" || {
+    echo "Failed to fetch data for $POKEMON" >> "$ERROR_FILE"
+    rm -f "$OUTPUT_FILE"
+  }
+}
+
+# Fetch data in parallel
+for POKEMON in "${POKEMON_LIST[@]}"; do
+  fetch_data "$POKEMON" &
+done
+
+# Wait for all background processes to complete
+wait
+echo "Data fetching completed."

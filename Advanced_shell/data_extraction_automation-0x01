@@ -1,0 +1,18 @@
+#!/bin/bash
+
+INPUT_FILE="data.json"
+
+if [ ! -f "$INPUT_FILE" ]; then
+  echo "JSON file not found!"
+  exit 1
+fi
+
+# Extract data using jq
+NAME=$(jq -r '.name' "$INPUT_FILE")
+HEIGHT=$(jq -r '.height' "$INPUT_FILE")
+FORMATTED_HEIGHT=$(echo "scale=1; $HEIGHT / 10" | bc)
+WEIGHT=$(jq -r '.weight' "$INPUT_FILE")
+TYPE=$(jq -r '.types[0].type.name' "$INPUT_FILE")
+
+# Format output
+echo "$NAME is of type $TYPE, weighs $((WEIGHT / 10))kg, and is ${FORMATTED_HEIGHT}m tall."
